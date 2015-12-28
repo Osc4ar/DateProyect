@@ -36,6 +36,15 @@ int repeat(char a[])
 	return 0;
 }
 
+int isAfter(Date *d1, Date *d2)
+{
+	if(d1 -> m < d2 -> m)
+		return 1;
+	if(d1 -> m == d2 -> m && d1 -> d <= d2 -> d)
+		return 1;
+	return 0;
+}
+
 int isAfterFeb(Date *da)
 {
 	if(da -> m > 2 && isLeapYear(da -> y))
