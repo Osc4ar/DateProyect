@@ -7,6 +7,11 @@ struct date
 };
 typedef struct date Date;
 
+int f()
+{
+	return 1;
+}
+
 Date* newDate(char f[])
 {
 	Date* nvo = (Date*)malloc(sizeof(Date));
@@ -14,13 +19,6 @@ Date* newDate(char f[])
 	nvo -> m = (((f[0] - 48) * 10) + (f[1] - 48));;
 	nvo -> y = (((f[6] - 48) * 1000) + ((f[7] - 48) * 100) + ((f[8] - 48) * 10) + (f[9] - 48));
 	return nvo;
-}
-
-int cmpDates(Date* d1, Date* d2)
-{
-	if(((d1 -> y) <= (d2 -> y)) && ((d1 -> m) <= (d2 -> m)) && ((d1 -> d) < (d2 -> d)))
-		return 1;
-	return 0;
 }
 
 int repeat(char a[])
@@ -38,46 +36,56 @@ int repeat(char a[])
 	return 0;
 }
 
+int isAfterFeb(Date *da)
+{
+	if(da -> m > 2 && isLeapYear(da -> y))
+		return 1;
+	return 0;
+}
+
+int isBeforeLeapDay(Date *da)
+{
+	if(da -> m < 2 || da -> m == 2 && da -> d < 29)
+		return 1;
+	return 0;
+}
+
+int getDaysFromMonths(Date *d1, Date *d2)
+{
+	int dfm[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	int m = 0, i;
+	for(i = (d2 -> m); i < (d1 -> m); i++)
+	{
+		m += dfm[i];
+	}
+	return m;
+}
+
 int daysBetween(Date *d1, Date *d2)
 {
 	int y, m = 0, d = 0, i;
-	int dfm[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	
-	if((d1 -> m) == (d2 -> m))
+	y = ((d2 -> y) - (d1 -> y)) * 365;
+	
+	if(d1 -> m >= d2 -> m)
 	{
-		m = 0;
-		if(d1 -> d <= d2 -> d)
-		{
-			y = (d2 -> y) - (d1 -> y);
-			d = (d2 -> d) - (d1 -> d);
-		}
-		else
-		{
-			y = (d2 -> y) - (d1 -> y) - 1;
-			
-			for(i = (d1 -> m) + 1; i == d2 -> m; i++)
-			{
-				if(i > 12)
-					i = 1;
-				m += dfm[i];
-			}
-		}
+		m = getDaysFromMonths(d1, d2) * (-1);
 	}
 	else
 	{
-		if((d1 -> m) < (d2 -> m))
-		{
-			y = (d2 -> y) - (d1 -> y);	
-		}
-		else
-		{
-			y = (d2 -> y) - (d1 -> y) - 1;		
-		}
+		m = getDaysFromMonths(d2, d1);
 	}
 	
-	if(d2 -> m <= 2 && d2 -> d <= 28)
-		return ((y * 365) + numberOfLeapYears(d1 -> y, d2 -> y) + d + m) - 1;
-	return ((y * 365) + numberOfLeapYears(d1 -> y, d2 -> y) + d + m);
+	d = ((d1 -> d) - (d2 -> d));
+	if(isAfter(d1, d2) && d < 0)
+		d *= (-1);
+	else
+	{
+		if(d > 0)
+			d *= (-1);                                          
+	}
+	printf("d = %d\nm = %d\ny = %d\nLeap = %d\n", d, m, y, numberOfLeapYears((d1 -> y), (d2 -> y)));
+	return y + m + d + numberOfLeapYears((d1 -> y), (d2 -> y)) - isBeforeLeapDay(d2) - isAfterFeb(d1);
 }
 
 int dateOK(Date* date)
