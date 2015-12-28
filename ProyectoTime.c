@@ -7,11 +7,6 @@ struct date
 };
 typedef struct date Date;
 
-int f()
-{
-	return 1;
-}
-
 Date* newDate(char f[])
 {
 	Date* nvo = (Date*)malloc(sizeof(Date));
@@ -54,15 +49,21 @@ int isAfterFeb(Date *da)
 
 int isBeforeLeapDay(Date *da)
 {
-	if(da -> m < 2 || da -> m == 2 && da -> d < 29)
+	if(da -> m < 2)
 		return 1;
+	if(da -> m == 2)
+	{
+		if(da -> d < 29)
+			return 1;
+		return 0;
+	}
 	return 0;
 }
 
 int getDaysFromMonths(Date *d1, Date *d2)
 {
-	int dfm[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	int m = 0, i;
+	int dfm[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	int m = 0, i, n;
 	for(i = (d2 -> m); i < (d1 -> m); i++)
 	{
 		m += dfm[i];
@@ -93,7 +94,6 @@ int daysBetween(Date *d1, Date *d2)
 		if(d > 0)
 			d *= (-1);                                          
 	}
-	printf("d = %d\nm = %d\ny = %d\nLeap = %d\n", d, m, y, numberOfLeapYears((d1 -> y), (d2 -> y)));
 	return y + m + d + numberOfLeapYears((d1 -> y), (d2 -> y)) - isBeforeLeapDay(d2) - isAfterFeb(d1);
 }
 
@@ -234,6 +234,9 @@ int main()
 					{
 						ok = 1;
 						printf("Han pasado %d dias.\n", daysBetween(first, last));
+						getchar();
+						puts("Repetir?");
+						scanf("%s", &r);
 					}
 					else
 					{
