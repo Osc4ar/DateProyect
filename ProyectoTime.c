@@ -193,18 +193,54 @@ int numberOfLeapYears(int y1, int y2)
 	return cont;
 }
 
+int setMonths(Date *d, int lapse)
+{
+	int dfm[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	int i = 0;
+	for(i = 0; lapse > dfm[i]; i++)
+	{
+		if(isLeapYear(d -> y))
+			dfm[1] = 29;
+		else
+			dfm[1] = 28;
+			
+		lapse -= dfm[i];
+		
+		if(d -> m != 12)
+			(d -> m) = (d -> m) + 1;	
+		else
+		{
+			i = 0;
+			(d -> y) = (d -> y) + 1;
+			(d -> m) = 1;
+		}
+	}
+	printf("\n\nValor del lapso: %d\n", lapse);
+	return lapse;
+}
+
+Date* getLastDate(Date *d1, int lapse)
+{
+	Date* last = (Date*) malloc(sizeof(Date));
+	last -> y = (d1 -> y) + (lapse / 365);
+	lapse = lapse - ((lapse / 365) * 365);
+	
+	last -> m = d1 -> m;
+	lapse = setMonths(last, lapse);
+	last -> d = d1 -> d;
+	return last;
+}
+
 int main()
 {
-	int daysForMonth[] = {31, 28, 31, 30, 31, 30 , 31, 31, 30, 31, 30, 31};
-	int months[] = {1, 2, 3, 4, 5, 6 , 7, 8, 9, 10, 11, 12};
 	char option, r[2];
 	char firstDate[10], lastDate[10];
 	Date *first, *last;
-	int ok;
+	int ok, lapse;
 	
 	do
 	{
-		puts("Este programa hace las siguientes funciones respecto a fechas, siempre y cuando las fechas pertenezcan al calendario gregoriano\n");
+		puts("\n\n\nEste programa hace las siguientes funciones respecto a fechas, siempre y cuando las fechas pertenezcan al calendario gregoriano\n");
 		puts("que es a partir del año 1600.\n\n");
 		puts("a) Calcula cuantos dias hay entre dos fechas ingresadas por el usuario.\n\n");
 		puts("b) Dada una fecha inicial y un rango de dias calcula en que dia acaba el rango de dias.\n\n");
@@ -247,9 +283,29 @@ int main()
 			break;
 			
 			case 'b':
-				getchar();
-				puts("Repetir?");
-				scanf("%s", &r);	
+				do
+				{
+					getchar();
+					puts("Ingresa la fecha inicial: (mm dd aaaa)\n");
+					gets(firstDate);
+					first = newDate(firstDate);
+					puts("Ingresa el lapso de dias:\n");
+					scanf("%d", &lapse);
+					if(dateOK(first) && lapse > 0)
+					{
+						ok = 1;
+						last  = getLastDate(first, lapse);
+						printf("La fecha final (en formato mm/dd/aaaa) es: %02d/%02d/%02d.\n", last -> m, last -> d, last -> y);
+						getchar();
+						puts("Repetir?");
+						scanf("%s", &r);
+					}
+					else
+					{
+						ok = 0;
+						puts("Datos invalidos.");
+					}
+				}while(!ok);
 			break;
 			
 			default:
