@@ -196,8 +196,8 @@ int numberOfLeapYears(int y1, int y2)
 int setMonths(Date *d, int lapse)
 {
 	int dfm[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	int i = 0;
-	for(i = 0; lapse > dfm[i]; i++)
+	int i;
+	for(i = (d -> m) - 1; lapse > dfm[i]; i++)
 	{
 		if(isLeapYear(d -> y))
 			dfm[1] = 29;
@@ -210,24 +210,76 @@ int setMonths(Date *d, int lapse)
 			(d -> m) = (d -> m) + 1;	
 		else
 		{
-			i = 0;
+			i = -1;
 			(d -> y) = (d -> y) + 1;
 			(d -> m) = 1;
 		}
 	}
-	printf("\n\nValor del lapso: %d\n", lapse);
+	
+	return lapse;
+}
+
+void setDays(Date *da, int lapse)
+{
+	int dfm[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	int i;
+	for(i = (da -> m) - 1; lapse > 0; lapse--)
+	{
+		if(isLeapYear(da -> y))
+			dfm[1] = 29;
+		else
+			dfm[1] = 28;
+			
+		if(da -> d < dfm[i])
+			(da -> d)++;
+		else
+		{
+			if(i == 11)
+			{
+				i = 0;
+				(da -> y)++;
+			}
+			else
+			{
+				i++;
+				da -> d = 1;	
+			}
+		}
+	}
+}
+
+int setYear(Date *da, int lapse)
+{
+	int ylong;
+	if(isLeapYear(da -> y))
+		ylong = 366;
+	else
+		ylong = 365;
+	while(lapse / ylong > 0)
+	{
+		if(isLeapYear(da -> y))
+			ylong = 366;
+		else
+			ylong = 365;
+		(da -> y)++;
+		lapse = lapse - ylong;
+	}
 	return lapse;
 }
 
 Date* getLastDate(Date *d1, int lapse)
 {
 	Date* last = (Date*) malloc(sizeof(Date));
-	last -> y = (d1 -> y) + (lapse / 365);
-	lapse = lapse - ((lapse / 365) * 365);
+	
+	last -> y = d1 -> y;
+	lapse = setYear(last, lapse);
 	
 	last -> m = d1 -> m;
 	lapse = setMonths(last, lapse);
+	
 	last -> d = d1 -> d;
+	setDays(last, lapse);
+	
 	return last;
 }
 
