@@ -49,6 +49,8 @@ int isAfterFeb(Date *da)
 
 int isBeforeLeapDay(Date *da)
 {
+	if(!isLeapYear(da -> y))
+		return 0;
 	if(da -> m < 2)
 		return 1;
 	if(da -> m == 2)
@@ -259,6 +261,7 @@ void setDays(Date *da, int lapse)
 			{
 				i = 0;
 				da -> m = 1;
+				da -> d = 1;
 				(da -> y)++;
 			}
 			else
@@ -288,24 +291,21 @@ void setDays(Date *da, int lapse)
 
 int setYear(Date *da, int lapse)
 {
-	int ylong = 365;
-	printf("Valor del if: %d\n", (isLeapYear(da -> y) && (da -> m <= 2)));
-	printf("Valor del mes: %d\n", da -> m);
-	printf("Valor del if del mes: %d\n", da -> m <= 2);
-	if(isLeapYear(da -> y) && (da -> m <= 2))
+	int ylong;
+	if((isLeapYear(da -> y) && (da -> m <= 2)) || ((isLeapYear((da -> y) + 1)) && (da -> m) > 2))
 		ylong = 366;
 	else
 		ylong = 365;
 		
 	while(lapse / ylong > 0)
 	{
-		(da -> y)++;
-		lapse = lapse - ylong;
-		
-		if(isLeapYear(da -> y))
+		if((isLeapYear(da -> y) && (da -> m <= 2)) || ((isLeapYear((da -> y) + 1)) && (da -> m) > 2))
 			ylong = 366;
 		else
 			ylong = 365;
+			
+		(da -> y)++;
+		lapse = lapse - ylong;
 	}
 	return lapse;
 }
@@ -317,8 +317,8 @@ Date* getLastDate(Date *d1, int lapse)
 	last -> y = d1 -> y;
 	last -> m = d1 -> m;
 	last -> d = d1 -> d;
+	
 	lapse = setYear(last, lapse);
-	printf("\nLapso vale: %d\n", lapse);
 	lapse = setMonths(last, lapse);
 	setDays(last, lapse);
 	
@@ -363,7 +363,10 @@ int main()
 					if(dateOK(first) && dateOK(last))
 					{
 						ok = 1;
-						printf("Han pasado %d dias.\n", daysBetween(first, last));
+						if(first -> y <= last -> y)
+							printf("Han pasado %d dias.\n", daysBetween(first, last));
+						else
+							printf("Han pasado -%d dias.\n", daysBetween(last, first));
 						getchar();
 						puts("Repetir?");
 						scanf("%s", &r);
